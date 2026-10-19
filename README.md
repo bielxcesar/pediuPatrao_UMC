@@ -80,8 +80,9 @@ O projeto adota o padrão em camadas desacopladas (Layered Architecture):
 
 ### RF03 — Controle e Transições de Status dos Pedidos
 * **Máquina de Estados de Pedidos:** Sequência estrita de transição:  
-  $$\text{RECEBIDO} \longrightarrow \text{EM\_PREPARACAO} \longrightarrow \text{PRONTO} \longrightarrow \text{SAIU\_ENTREGA} \longrightarrow \text{FINALIZADO}$$
-* **Validação de Transição:** Tentativas de saltar estados (ex: de `RECEBIDO` para `FINALIZADO`) são rejeitadas pelo `PedidoService`.
+`RECEBIDO` ➔ `EM_PREPARACAO` ➔ `PRONTO` ➔ `SAIU_ENTREGA` ➔ `FINALIZADO`* **Validação de Transição:** Tentativas de saltar estados (ex: de `RECEBIDO` para `FINALIZADO`)
+
+ são rejeitadas pelo `PedidoService`.
 * **Gestão Dinâmica da Fila de Atendimento:**
   * **Prioridade de Tela:** Pedidos em processamento ficam fixos no topo da lista.
   * **Carrossel de Finalizados (FIFO):** A tela exibe no máximo **6 pedidos finalizados recentes** no rodapé da lista. A entrada do 7º pedido finalizado remove o mais antigo da visualização.
