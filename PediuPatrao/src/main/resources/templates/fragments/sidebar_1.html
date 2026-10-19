@@ -95,6 +95,15 @@
                 </ul>
             </li>
 
+            <!-- Botão de Sair fixo embaixo (movido para fora do submenu) -->
+            <li class="nav-item mt-auto">
+                <form th:action="@{/logout}" method="post" class="p-3">
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-box-arrow-right me-2"></i>Sair
+                    </button>
+                </form>
+            </li>
+
         </ul>
 
         <!-- Rodapé -->

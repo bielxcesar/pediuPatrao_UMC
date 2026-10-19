@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Lista de Pedidos</title>
 </head>
@@ -7,13 +7,17 @@
 
 <div th:fragment="content">
 
+    <!-- Cabeçalho -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">
             <i class="bi bi-bag me-2 text-primary"></i>Pedidos
         </h2>
+        <a href="/pedidos/novo" class="btn btn-primary fw-bold" sec:authorize="hasAnyAuthority('ATENDENTE', 'ROLE_ATENDENTE', 'GERENTE', 'ROLE_GERENTE')">
+            <i class="bi bi-plus-lg me-1"></i> Novo Pedido
+        </a>
     </div>
 
-    <!-- Mensagens de feedback -->
+    <!-- Mensagens de Feedback -->
     <div class="alert alert-success alert-dismissible fade show" th:if="${sucesso}" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
         <span th:text="${sucesso}"></span>
@@ -25,46 +29,124 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <!-- Tabela -->
-    <div class="card shadow-sm">
+    <!-- Tabela de Pedidos -->
+    <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
                     <tr>
-                        <th class="ps-4">ID</th>
-                        <th>Cliente ID</th>
-                        <th>Tipo de Pizza</th>
+                        <th class="ps-4">#ID</th>
+                        <th>Cliente</th>
+                        <th>Tamanho</th>
                         <th>Sabor</th>
-                        <th>Quantidade</th>
-                        <th>Status</th>
+                        <th class="text-center">Qtd</th>
+                        <th>Valor Total</th>
+                        <th class="text-center">Status</th>
+                        <th>Ações</th>
                     </tr>
-                </thead>
-                <tbody>
-                    <!-- Lista vazia -->
+                    </thead>
+                    <tbody>
+                    <!-- Lista Vazia -->
                     <tr th:if="${#lists.isEmpty(pedidos)}">
-                        <td colspan="6" class="text-center text-muted py-5">
+                        <td colspan="8" class="text-center text-muted py-5">
                             <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                             Nenhum pedido encontrado.
                         </td>
                     </tr>
-                    <!-- Linhas -->
+
+                    <!-- Linhas dos Pedidos -->
                     <tr th:each="pedido : ${pedidos}">
-                        <td class="ps-4 text-muted" th:text="${pedido.id}"></td>
-                        <td th:text="${pedido.clienteId}"></td>
+                        <td class="ps-4 text-muted small fw-monospace"
+                            th:text="${pedido.id != null and pedido.id.length() > 8 ? '#' + pedido.id.substring(pedido.id.length() - 6) : pedido.id}"></td>
+
+                        <td class="fw-bold text-dark"
+                            th:text="${pedido.clienteNome != null ? pedido.clienteNome : pedido.clienteId}"></td>
+
                         <td th:text="${pedido.tipoPizza}"></td>
                         <td th:text="${pedido.sabor}"></td>
-                        <td th:text="${pedido.quantidade}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${pedido.status == 'ENTREGUE'} ? 'bg-success' :
-                                                  (${pedido.status == 'CANCELADO'} ? 'bg-danger' :
-                                                  (${pedido.status == 'EM_PREPARO'} ? 'bg-warning text-dark' : 'bg-secondary'))"
-                                  th:text="${pedido.status}">
+                        <td class="text-center fw-semibold" th:text="${pedido.quantidade}"></td>
+
+                        <!-- Coluna de Valor Total (Já calculado com Desconto) -->
+                        <td class="fw-bold text-success">
+                            <span th:text="${pedido.valorTotal != null ? 'R$ ' + #numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA') : 'R$ 0,00'}"></span>
+                            <!-- Exibe aviso discreto se houve desconto -->
+                            <small class="d-block text-muted text-decoration-line-through fw-normal"
+                                   th:if="${pedido.desconto != null and pedido.desconto.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                                <span th:text="${'R$ ' + #numbers.formatDecimal(pedido.valorTotal.add(pedido.desconto), 1, 'POINT', 2, 'COMMA')}"></span>
+                            </small>
+                        </td>
+
+                        <!-- Badge de Status -->
+                        <td class="text-center">
+                            <span class="badge px-3 py-2"
+                                  th:classappend="${pedido.status == null ? 'bg-secondary' :
+                                                  (pedido.status.name() == 'FINALIZADO' ? 'bg-success' :
+                                                  (pedido.status.name() == 'CANCELADO' ? 'bg-danger' :
+                                                  (pedido.status.name() == 'PREPARANDO' ? 'bg-warning text-dark' :
+                                                  (pedido.status.name() == 'PRONTO' ? 'bg-info text-dark' :
+                                                  (pedido.status.name() == 'A_CAMINHO' ? 'bg-primary' : 'bg-secondary')))))}"
+                                  th:text="${pedido.status != null ? pedido.status.name() : 'RECEBIDO'}">
                             </span>
                         </td>
+
+                        <!-- Coluna de Ações -->
+                        <td>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                                <!-- Transição de Status -->
+                                <form th:if="${pedido.status == null or pedido.status.name() == 'RECEBIDO'}"
+                                      th:action="@{/pedidos/{id}/status(id=${pedido.id})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="PREPARANDO" />
+                                    <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold" title="Enviar para a cozinha">
+                                        <i class="bi bi-fire me-1"></i> Ir p/ Cozinha
+                                    </button>
+                                </form>
+
+                                <form th:if="${pedido.status != null and pedido.status.name() == 'PREPARANDO'}"
+                                      th:action="@{/pedidos/{id}/status(id=${pedido.id})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="PRONTO" />
+                                    <button type="submit" class="btn btn-sm btn-info text-dark fw-bold" title="Marcar como pronto">
+                                        <i class="bi bi-check2-all me-1"></i> Marcar Pronto
+                                    </button>
+                                </form>
+
+                                <form th:if="${pedido.status != null and pedido.status.name() == 'PRONTO'}"
+                                      th:action="@{/pedidos/{id}/status(id=${pedido.id})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="A_CAMINHO" />
+                                    <button type="submit" class="btn btn-sm btn-primary fw-bold" title="Enviar para entrega">
+                                        <i class="bi bi-truck me-1"></i> Saiu p/ Entrega
+                                    </button>
+                                </form>
+
+                                <form th:if="${pedido.status != null and pedido.status.name() == 'A_CAMINHO'}"
+                                      th:action="@{/pedidos/{id}/status(id=${pedido.id})}" method="post" class="d-inline">
+                                    <input type="hidden" name="status" value="FINALIZADO" />
+                                    <button type="submit" class="btn btn-sm btn-success fw-bold" title="Concluir pedido">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Finalizar
+                                    </button>
+                                </form>
+
+                                <!-- Cancelamento de Pedido (Exclusivo Gerente) -->
+                                <div sec:authorize="hasAnyAuthority('GERENTE', 'ROLE_GERENTE')"
+                                     th:if="${pedido.status == null or (pedido.status.name() != 'A_CAMINHO' and pedido.status.name() != 'FINALIZADO' and pedido.status.name() != 'CANCELADO')}"
+                                     class="d-inline">
+                                    <form th:action="@{/pedidos/{id}/cancelar(id=${pedido.id})}" method="post" class="d-inline">
+                                        <div class="input-group input-group-sm" style="width: 170px;">
+                                            <input type="text" name="justificativa" class="form-control" placeholder="Motivo cancelamento" required>
+                                            <button type="submit" class="btn btn-outline-danger" title="Cancelar Pedido">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </td>
                     </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="card-footer text-muted small" th:if="${!#lists.isEmpty(pedidos)}">
             Total: <strong th:text="${#lists.size(pedidos)}"></strong> pedido(s)

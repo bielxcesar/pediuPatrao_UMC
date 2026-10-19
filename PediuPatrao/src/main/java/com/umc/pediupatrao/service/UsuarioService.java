@@ -1,7 +1,9 @@
 package com.umc.pediupatrao.service;
 
+import com.mongodb.internal.connection.Authenticator;
 import com.umc.pediupatrao.entity.Usuario;
 import com.umc.pediupatrao.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,13 +46,24 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    // Atualiza o usuário usuários
+    // Atualiza o usuário
     public void atualizarUsuario(String id, Usuario usuarioAtualizado) {
         usuarioRepository.findById(id).ifPresent(usuarioExistente -> {
             usuarioExistente.setUsername(usuarioAtualizado.getUsername());
-            usuarioExistente.setRole(usuarioAtualizado.getRole());
 
-            // Só atualiza a senha se uma nova foi informada
+            if (usuarioAtualizado.getRole() != null && !usuarioAtualizado.getRole().equals(usuarioExistente.getRole())) {
+                org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+                // CORREÇÃO: Verifica tanto "ADMIN" quanto "ROLE_ADMIN"
+                boolean isAdmin = auth.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
+
+                if (!isAdmin) {
+                    throw new RuntimeException("Acesso negado: Apenas administradores podem alterar perfil.");
+                }
+                usuarioExistente.setRole(usuarioAtualizado.getRole());
+            }
+
             if (usuarioAtualizado.getPassword() != null && !usuarioAtualizado.getPassword().isBlank()) {
                 usuarioExistente.setPassword(passwordEncoder.encode(usuarioAtualizado.getPassword()));
             }

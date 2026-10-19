@@ -1,80 +1,77 @@
-dia 10/10 realizando passo 1 de 6
+## FASE 1: ARQUITETURA BASE E SEGURANÇA
+**Passo 1:** Reestruturação do Domínio (Entidades e Enums)
 
-Passo 1: Reestruturação de Domínio (Entidades e Enums)
-Crie os enumeradores para padronizar as regras de negócio antes de alterar as entidades.
+Status: CONCLUÍDO
 
-Criar RoleEnum com os valores ADMIN, GERENTE, ATENDENTE.
+- Enumeração de perfis via RoleEnum (ADMIN, GERENTE, ATENDENTE).
 
-Criar StatusPedidoEnum com os valores RECEBIDO, EM_PREPARACAO, PRONTO, SAIU_ENTREGA, FINALIZADO, CANCELADO.
+- Ciclo de vida de pedidos em StatusPedidoEnum (RECEBIDO, EM_PREPARACAO, PRONTO, SAIU_ENTREGA, FINALIZADO, CANCELADO).
 
-Atualizar a entidade Usuario para utilizar o RoleEnum.
+- Atualização do modelo Usuario para utilizar o RoleEnum.
 
-Atualizar a entidade Pedido adicionando: lista de itens, status, valor total, desconto, responsável pelo registro, data/hora de entrada e de saída.
+- Expansão da entidade Pedido com itens, totais, descontos, responsável e timestamps.
 
-Criar a entidade Auditoria contendo: id, usuario, role, dataHora, operacao, entidadeAfetada, idEntidade, campoModificado, valorAnterior, valorNovo, justificativa.
-
-(concluido)
+- Criação da entidade Auditoria para persistência de alterações no MongoDB.
 
 
----
+**Passo 2:** Configuração de Segurança e Autorização (RF01)
+Status: CONCLUÍDO
 
-Passo 2: Configuração de Segurança e Autorização (RF01)
-A proteção deve ocorrer no backend para evitar manipulações de requisições.
+- Migração para SecurityFilterChain no SecurityConfig.
 
-Modificar SecurityConfig para utilizar SecurityFilterChain.
+- Bloqueio de rotas administrativas /usuarios/** para perfil ADMIN.
 
-Restringir endpoints no SecurityConfig (ex: /usuarios/** apenas para ADMIN).
+- Restrição de cancelamento e desconto exclusivamente ao perfil GERENTE.
 
-Restringir endpoints de desconto e cancelamento de pedidos apenas para GERENTE.
+- Validação de elevação de privilégios e proteção CSRF ativa.
 
-Habilitar proteção CSRF padrão do Spring Security e garantir que os formulários Thymeleaf enviem o token.
+**Passo 3:** Serviço de Auditoria e Persistência de Logs (RF05)
+Status: CONCLUÍDO
 
-No UsuarioService, validar que apenas perfis ADMIN podem alterar a role de outros usuários.
+- Criação do AuditoriaRepository e AuditoriaService.
 
----
+- Captura automática de usuário autenticado e perfil via SecurityContextHolder.
 
-Passo 3: Serviço de Auditoria (RF05)
-Implemente a auditoria primeiro para injetá-la nos demais serviços posteriormente.
-
-Criar AuditoriaRepository.
-
-Criar AuditoriaService com um método principal para registrar eventos.
-
-Capturar o usuário autenticado via SecurityContextHolder dentro do serviço de auditoria.
-
-Garantir que não haja endpoints de exclusão ou alteração (PUT/DELETE) no AuditoriaController, apenas GET para ADMIN e GERENTE.
+- Imutabilidade dos registros com exposição apenas via GET no AuditoriaController para ADMIN e GERENTE.
 
 ---
 
-Passo 4: Evolução e Fluxo de Pedidos (RF02, RF03 e RF04)
-Toda a lógica de transição e cálculo deve residir no PedidoService.
+## FASE 2: REGRAS DE NEGÓCIO E AUDITORIA AVANÇADA
+**Passo 4:** Evolução e Fluxo de Pedidos (RF02, RF03 e RF04)
+Status: CONCLUÍDO
 
-Implementar o cálculo do valor total no momento de salvar o pedido, somando os itens e subtraindo o desconto, ignorando valores enviados pelo front-end.
+- Processamento e cálculo de totais realizado no backend.
 
-Criar validação de transição de status utilizando um switch-case ou estrutura similar para impedir saltos inválidos (ex: RECEBIDO não pode ir direto para FINALIZADO).
+- Controle de transição de status e bloqueios de saltos inválidos.
 
-Criar método cancelarPedido(Long id, String justificativa) restrito ao GERENTE. Validar se o status atual permite cancelamento (não pode ter saído para entrega) e registrar na auditoria.
+- Operações de cancelamento e desconto restritas ao GERENTE (limite de 20% no desconto) com registro em auditoria.
 
-Criar método aplicarDesconto(Long id, BigDecimal percentual) restrito ao GERENTE. Validar limite de 20%, status do pedido, recalcular o total e registrar na auditoria.
+**Passo 5:** Auditoria de Clientes (RF05)
+Status: CONCLUÍDO
 
----
+- Integração do AuditoriaService ao ClienteService.
 
-Passo 5: Auditoria de Clientes (RF05)
-Integrar o serviço de auditoria nas operações de cliente.
+- Comparação de estado anterior e atual no banco de dados.
 
-No ClienteService, ao executar o método de atualização, buscar o cliente atual no banco antes de salvar.
-
-Comparar os campos alterados (telefone, logradouro, etc.) entre o objeto antigo e o novo.
-
-Para cada campo modificado, disparar o registro no AuditoriaService.
+- Geração de logs granulares para alterações de nome, telefone e endereço.
 
 ---
 
-Passo 6: Ajustes de Interface (Thymeleaf)
-Refletir as regras do backend na camada de visualização.
+## FASE 3: INTERFACE DE USUÁRIO E FLUXOS COMPLEMENTARES
+**Passo 6:** Ajustes de Interface e Permissões Visuais
+Status: CONCLUÍDO
 
-Adicionar o namespace do Spring Security no Thymeleaf (xmlns:sec="[http://www.thymeleaf.org/extras/spring-security](http://www.thymeleaf.org/extras/spring-security)").
+- Integração de namespace de segurança no Thymeleaf.
 
-Utilizar sec:authorize="hasAuthority('GERENTE')" para exibir os botões de desconto e cancelamento.
+- Dropdown de perfis ajustado para exibir ADMIN, GERENTE e ATENDENTE.
 
-Desabilitar campos de formulário e ocultar botões de transição de status que não sejam compatíveis com o estado atual do pedido.
+- Restrição e bloqueio visual de ações de acordo com o perfil logado.
+
+**Passo 7:** Organização de Rotas e Fluxo de Recuperação de Senha
+Status: CONCLUÍDO
+
+- Mapeamento de rotas e feedback de autenticação no login.
+
+- Fluxo completo de "Esqueceu a senha?" (solicitação por e-mail, geração de código de 6 dígitos no console/log, validação, confirmação de nova senha e bloqueio de 5 minutos após 5 erros).
+
+- Recriação automática de contas de teste via PizzariaPedidosApplication com e-mails vinculados.

@@ -1,6 +1,6 @@
 package com.umc.pediupatrao.entity.enums;
 
-public class RoleEnum {
+public enum RoleEnum {
     ADMIN,
     GERENTE,
     ATENDENTE

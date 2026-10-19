@@ -48,9 +48,6 @@ public class HomeController {
         return "layout";
     }
 
-    // ========================
-    // USUÁRIOS
-    // ========================
     @GetMapping("/usuarios")
     public String listarUsuarios(Model model) {
         List<Usuario> usuarios = (List<Usuario>) usuarioService.listarTodos();
@@ -69,7 +66,7 @@ public class HomeController {
 
     @GetMapping("/usuarios/editar/{id}")
     public String editarUsuarioForm(@PathVariable String id, Model model,
-            RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes) {
         boolean encontrado = usuarioService.buscarPorId(id).map(u -> {
             model.addAttribute("usuario", u);
             return true;
@@ -86,7 +83,7 @@ public class HomeController {
 
     @PostMapping("/usuarios/salvar")
     public String salvarUsuario(@ModelAttribute Usuario usuario,
-            RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
         usuarioService.salvarUsuario(usuario);
         redirectAttributes.addFlashAttribute("sucesso", "Usuário criado com sucesso!");
         return "redirect:/usuarios";
@@ -94,8 +91,8 @@ public class HomeController {
 
     @PostMapping("/usuarios/editar/{id}")
     public String atualizarUsuario(@PathVariable String id,
-            @ModelAttribute Usuario usuario,
-            RedirectAttributes redirectAttributes) {
+                                   @ModelAttribute Usuario usuario,
+                                   RedirectAttributes redirectAttributes) {
         usuarioService.atualizarUsuario(id, usuario);
         redirectAttributes.addFlashAttribute("sucesso", "Usuário atualizado com sucesso!");
         return "redirect:/usuarios";
@@ -103,27 +100,13 @@ public class HomeController {
 
     @PostMapping("/usuarios/deletar/{id}")
     public String deletarUsuario(@PathVariable String id,
-            RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes) {
         usuarioService.deletarUsuario(id);
         redirectAttributes.addFlashAttribute("sucesso", "Usuário removido com sucesso!");
         return "redirect:/usuarios";
     }
 
-    // ========================
-    // PEDIDOS
-    // ========================
-    @GetMapping("/pedidos")
-    public String pedidos(Model model) {
-        List<Pedido> pedidos = pedidoService.listarPedidos();
-        model.addAttribute("pedidos", pedidos);
-        model.addAttribute("content", "pedidos :: content");
-        log.info("Carregando fragmento: pedidos :: content");
-        return "layout";
-    }
 
-    // ========================
-    // PRODUTOS
-    // ========================
     @GetMapping("/produtos")
     public String produtos(Model model) {
         List<Produto> produtos = produtoService.listarProdutos();
@@ -133,9 +116,6 @@ public class HomeController {
         return "layout";
     }
 
-    // ========================
-    // CLIENTES
-    // ========================
     @GetMapping("/clientes")
     public String clientes(Model model) {
         List<Cliente> clientes = clienteService.listarClientes();
@@ -154,7 +134,7 @@ public class HomeController {
 
     @PostMapping("/clientes/salvar")
     public String salvarCliente(@ModelAttribute Cliente cliente,
-            RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
         clienteService.salvar(cliente);
         redirectAttributes.addFlashAttribute("sucesso", "Cliente criado com sucesso!");
         return "redirect:/clientes";
@@ -162,7 +142,7 @@ public class HomeController {
 
     @GetMapping("/clientes/editar/{id}")
     public String editarClienteForm(@PathVariable String id, Model model,
-            RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes) {
         boolean encontrado = clienteService.buscarPorId(id).map(c -> {
             model.addAttribute("cliente", c);
             return true;
@@ -179,17 +159,14 @@ public class HomeController {
 
     @PostMapping("/clientes/editar/{id}")
     public String atualizarCliente(@PathVariable String id,
-            @ModelAttribute Cliente cliente,
-            RedirectAttributes redirectAttributes) {
+                                   @ModelAttribute Cliente cliente,
+                                   RedirectAttributes redirectAttributes) {
         cliente.setId(id);
         clienteService.salvar(cliente);
         redirectAttributes.addFlashAttribute("sucesso", "Cliente atualizado com sucesso!");
         return "redirect:/clientes";
     }
 
-    // ========================
-    // OUTRAS ROTAS
-    // ========================
     @GetMapping("/configuracoes")
     public String configuracoes(Model model) {
         model.addAttribute("content", "configuracoes :: content");

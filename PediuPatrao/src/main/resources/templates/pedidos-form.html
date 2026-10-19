@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Pedido - Pediu Patrão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+<div class="container py-5" style="max-width: 650px;">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/pedidos" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="fw-bold mb-0">Novo Pedido</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form th:action="@{/pedidos/salvar}" th:object="${pedido}" method="post">
+
+                <!-- Seleção do Cliente -->
+                <div class="mb-3">
+                    <label for="clienteId" class="form-label fw-medium">Cliente</label>
+                    <select id="clienteId" name="clienteId" class="form-select" required>
+                        <option value="" disabled selected>Selecione um cliente</option>
+                        <option th:each="c : ${clientes}"
+                                th:value="${c.id}"
+                                th:text="${c.nome + ' - ' + c.telefone}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Tipo de Pizza -->
+                <div class="mb-3">
+                    <label for="tipoPizza" class="form-label fw-medium">Tamanho / Tipo de Pizza</label>
+                    <select id="tipoPizza" name="tipoPizza" class="form-select" required>
+                        <option value="" disabled selected>Selecione o tamanho</option>
+                        <option value="Grande">Grande (8 fatias)</option>
+                        <option value="Média">Média (6 fatias)</option>
+                        <option value="Brotinho">Brotinho (4 fatias)</option>
+                    </select>
+                </div>
+
+                <!-- Sabor -->
+                <div class="mb-3">
+                    <label for="sabor" class="form-label fw-medium">Sabor</label>
+                    <input type="text" id="sabor" name="sabor" class="form-control" placeholder="Ex: Calabresa / Muçarela" required/>
+                </div>
+
+                <!-- Quantidade e Valor Unitário -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="quantidade" class="form-label fw-medium">Quantidade</label>
+                        <input type="number" id="quantidade" name="quantidade" class="form-control" value="1" min="1" required/>
+                    </div>
+                    <div class="col-6">
+                        <label for="valorUnitario" class="form-label fw-medium">Valor Unitário (R$)</label>
+                        <input type="number" step="0.01" id="valorUnitario" name="valorUnitario" class="form-control" placeholder="45.00" required/>
+                    </div>
+                </div>
+
+                <!-- Desconto Percentual (Visível e acessível para Gerentes) -->
+                <div class="mb-4" sec:authorize="hasAnyAuthority('GERENTE', 'ROLE_GERENTE')">
+                    <label for="percentualDesconto" class="form-label fw-medium text-success">
+                        Desconto (%) — Exclusivo Gerente (Máx. 20%)
+                    </label>
+                    <input type="number" id="percentualDesconto" name="percentualDesconto" class="form-control" placeholder="0" min="0" max="20" step="1"/>
+                    <div class="form-text">Informe o percentual caso queira aplicar desconto ao pedido.</div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold">
+                        Confirmar Pedido
+                    </button>
+                    <a href="/pedidos" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -5,6 +5,11 @@
 </head>
 <body>
 <div th:fragment="content">
+
+    <!-- Campos ocultos para o JavaScript capturar o Token de Segurança -->
+    <input type="hidden" id="csrfToken" th:value="${_csrf.token}"/>
+    <input type="hidden" id="csrfHeader" th:value="${_csrf.headerName}"/>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">
             <i class="bi bi-person-raised-hand me-2 text-primary"></i>Clientes
@@ -19,15 +24,15 @@
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-dark">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Telefone</th>
-                        <th>Endereço</th>
-                        <th class="text-end pe-4">Ações</th>
-                    </tr>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Endereço</th>
+                    <th class="text-end pe-4">Ações</th>
+                </tr>
                 </thead>
                 <tbody id="clientes-tabela">
-                    <!-- Linhas carregadas via JavaScript -->
+                <!-- Linhas carregadas via JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -36,6 +41,10 @@
     <script>
         const API_URL = '/api/clientes';
         const tabelaClientes = document.getElementById('clientes-tabela');
+
+        // Pega as informações do token de segurança dos inputs ocultos
+        const csrfToken = document.getElementById('csrfToken').value;
+        const csrfHeader = document.getElementById('csrfHeader').value;
 
         function formatarEndereco(cliente) {
             const partes = [
@@ -87,12 +96,18 @@
 
         async function excluirCliente(id) {
             if (confirm('Tem certeza que deseja excluir este cliente?')) {
-                const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+
                 if (response.ok) {
                     alert('Cliente excluído com sucesso!');
                     carregarClientes();
                 } else {
-                    alert('Erro ao excluir o cliente.');
+                    alert('Erro ao excluir o cliente. Verifique se você tem permissão.');
                 }
             }
         }

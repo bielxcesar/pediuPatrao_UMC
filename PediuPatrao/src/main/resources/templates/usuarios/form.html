@@ -64,10 +64,11 @@
                     <label for="role" class="form-label fw-medium">
                         <i class="bi bi-shield me-1"></i>Perfil
                     </label>
-                    <select id="role" class="form-select" th:field="*{role}" required>
+                    <select id="role" name="role" class="form-select" required>
                         <option value="" disabled>Selecione um perfil</option>
-                        <option value="ADMIN">ADMIN</option>
-                        <option value="USER">USER</option>
+                        <option value="ADMIN" th:selected="${usuario.role != null and usuario.role.name() == 'ADMIN'}">ADMIN</option>
+                        <option value="GERENTE" th:selected="${usuario.role != null and usuario.role.name() == 'GERENTE'}">GERENTE</option>
+                        <option value="ATENDENTE" th:selected="${usuario.role != null and usuario.role.name() == 'ATENDENTE'}">ATENDENTE</option>
                     </select>
                 </div>
 

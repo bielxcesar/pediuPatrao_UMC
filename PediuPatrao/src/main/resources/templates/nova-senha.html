@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Senha - Pediu Patrão</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center min-vh-100">
+<div class="container" style="max-width: 450px;">
+    <div class="card shadow border-0">
+        <div class="card-body p-4">
+            <h3 class="fw-bold text-center mb-3">Nova Senha</h3>
+            <p class="text-muted text-center small mb-4">Crie uma nova senha para a sua conta.</p>
+
+            <div th:if="${erro}" class="alert alert-danger py-2 small" th:text="${erro}"></div>
+
+            <form th:action="@{/esqueci-senha/redefinir}" method="post" onsubmit="return validarSenhas()">
+                <input type="hidden" name="email" th:value="${email}"/>
+                <input type="hidden" name="codigo" th:value="${codigo}"/>
+
+                <div class="mb-3">
+                    <label for="novaSenha" class="form-label">Nova Senha</label>
+                    <input type="password" id="novaSenha" name="novaSenha" class="form-control" required minlength="6">
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmarSenha" class="form-label">Confirmar Nova Senha</label>
+                    <input type="password" id="confirmarSenha" name="confirmarSenha" class="form-control" required minlength="6">
+                    <div id="msgErroSenha" class="text-danger small mt-1" style="display: none;">
+                        As senhas não coincidem.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Alterar Senha</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validarSenhas() {
+        const s1 = document.getElementById('novaSenha').value;
+        const s2 = document.getElementById('confirmarSenha').value;
+        const msg = document.getElementById('msgErroSenha');
+
+        if (s1 !== s2) {
+            msg.style.display = 'block';
+            return false;
+        }
+        msg.style.display = 'none';
+        return true;
+    }
+</script>
+</body>
+</html>
