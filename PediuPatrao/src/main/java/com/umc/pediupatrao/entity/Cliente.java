@@ -11,7 +11,6 @@ public class Cliente {
     private String nome;
     private String telefone;
 
-    // Endereço completo
     private String cep;
     private String logradouro;
     private String numero;

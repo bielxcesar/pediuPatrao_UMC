@@ -18,11 +18,9 @@ public class Usuario {
     private int tentativasCodigo = 0;
     private LocalDateTime bloqueioCodigoAte;
 
-    // Campos para controle de recuperação de senha
     private String codigoRecuperacao;
     private LocalDateTime expiracaoCodigo;
 
-    // Getters e Setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

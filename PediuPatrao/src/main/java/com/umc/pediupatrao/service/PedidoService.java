@@ -40,7 +40,6 @@ public class PedidoService {
 
     // 2. Listagem Inteligente (Fila ativa no topo, max 6 finalizados, sem cancelados)
     public List<Pedido> listarPedidos() {
-        // Limpa cancelados e aplica rotação de finalizados
         limparPedidosCancelados();
         limparFinalizadosExcedentes();
 
@@ -59,7 +58,7 @@ public class PedidoService {
                 .collect(Collectors.toList());
     }
 
-    // 3. Transição de Status com regra do carrossel
+    // Transição de Status com regra do carrossel
     public Pedido atualizarStatus(String id, StatusPedidoEnum novoStatus) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
@@ -95,15 +94,14 @@ public class PedidoService {
             throw new RuntimeException("Não é possível cancelar um pedido que já saiu para entrega ou foi finalizado.");
         }
 
-        // 1º REGISTRA A AUDITORIA COMPLETA NO MONGODB (Exigência RF04/RF05)
+        // REGISTRA A AUDITORIA COMPLETA NO MONGODB (Exigência RF04/RF05)
         auditoriaService.registrarAuditoria("CANCELAMENTO", "Pedido", pedido.getId(), "status",
                 pedido.getStatus().name(), "CANCELADO", "Justificativa: " + justificativa);
 
-        // 2º Remove o pedido da tabela da fila de atendimento
+        // Remove o pedido da tabela da fila de atendimento
         pedidoRepository.deleteById(id);
     }
 
-    // --- MÉTODOS DE MANUTENÇÃO DA TABELA (CARROSSEL E LIMPEZA) ---
 
     // Mantém no máximo os 6 pedidos finalizados mais recentes
     private void limparFinalizadosExcedentes() {

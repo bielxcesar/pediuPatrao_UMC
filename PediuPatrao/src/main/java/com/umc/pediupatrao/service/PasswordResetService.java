@@ -54,18 +54,18 @@ public class PasswordResetService {
 
         Usuario usuario = usuarioOpt.get();
 
-        // 1. Verifica se já está bloqueado
+        // Verifica se já está bloqueado
         if (usuario.getBloqueioCodigoAte() != null && LocalDateTime.now().isBefore(usuario.getBloqueioCodigoAte())) {
             long minutos = Duration.between(LocalDateTime.now(), usuario.getBloqueioCodigoAte()).toMinutes() + 1;
             return "Acesso bloqueado por " + minutos + " minuto(s) devido a 5 tentativas incorretas.";
         }
 
-        // 2. Verifica se o código expirou (15 minutos)
+        // Verifica se o código expirou (15 minutos)
         if (usuario.getExpiracaoCodigo() == null || LocalDateTime.now().isAfter(usuario.getExpiracaoCodigo())) {
             return "O código temporário expirou. Solicite um novo.";
         }
 
-        // 3. Valida se o código está correto
+        // Valida se o código está correto
         if (usuario.getCodigoRecuperacao() == null || !usuario.getCodigoRecuperacao().equals(codigo)) {
             int tentativas = usuario.getTentativasCodigo() + 1;
             usuario.setTentativasCodigo(tentativas);
@@ -82,7 +82,6 @@ public class PasswordResetService {
             return "Código incorreto. Você tem mais " + restantes + " tentativa(s) antes do bloqueio.";
         }
 
-        // Sucesso: reseta as tentativas
         usuario.setTentativasCodigo(0);
         usuario.setBloqueioCodigoAte(null);
         usuarioRepository.save(usuario);

@@ -11,7 +11,7 @@ public class Produto {
     @Id
     private String id;
     private String nome;
-    private String tipo; // Pizza, Esfiha, Bebida, Lanche
+    private String tipo;
     private Double preco;
     private Boolean ativo;
 

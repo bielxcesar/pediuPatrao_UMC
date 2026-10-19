@@ -52,19 +52,16 @@ public class ClienteService {
             if (existenteOpt.isPresent()) {
                 Cliente existente = existenteOpt.get();
 
-                // Verifica e audita se o nome mudou
                 if (existente.getNome() != null && !existente.getNome().equals(cliente.getNome())) {
                     auditoriaService.registrarAuditoria("ATUALIZAR", "Cliente", cliente.getId(), "nome",
                             existente.getNome(), cliente.getNome(), "Alteração de nome do cliente");
                 }
 
-                // Verifica e audita se o telefone mudou
                 if (existente.getTelefone() != null && !existente.getTelefone().equals(cliente.getTelefone())) {
                     auditoriaService.registrarAuditoria("ATUALIZAR", "Cliente", cliente.getId(), "telefone",
                             existente.getTelefone(), cliente.getTelefone(), "Alteração de telefone de contato");
                 }
 
-                // Verifica e audita se o logradouro mudou
                 if (existente.getLogradouro() != null && !existente.getLogradouro().equals(cliente.getLogradouro())) {
                     auditoriaService.registrarAuditoria("ATUALIZAR", "Cliente", cliente.getId(), "logradouro",
                             existente.getLogradouro(), cliente.getLogradouro(), "Alteração de endereço");

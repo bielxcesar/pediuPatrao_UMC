@@ -20,7 +20,6 @@ public class Pedido {
     private Integer quantidade;
     private String clienteNome;
 
-    // Lista de itens do pedido (resolve o getItens())
     private List<ItemPedido> itens = new ArrayList<>();
 
     // Valores numéricos padronizados para BigDecimal (resolve os tipos incompatíveis)
@@ -31,7 +30,6 @@ public class Pedido {
     private StatusPedidoEnum status;
     private String responsavelRegistro;
 
-    // Responsável pela saída (resolve o setResponsavelSaida())
     private String responsavelSaida;
 
     private LocalDateTime dataHoraEntrada;
@@ -39,7 +37,6 @@ public class Pedido {
 
     public Pedido() {}
 
-    // Getters e Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

@@ -20,33 +20,27 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Busca um usuário por ID
     public Optional<Usuario> buscarPorId(String id) {
         return usuarioRepository.findById(id);
     }
 
-    // Busca um usuário por username
     public Optional<Usuario> buscarPorUsername(String username) {
         return usuarioRepository.findByUsername(username);
     }
 
-    // Salva um novo usuário (criptografando a senha)
     public void salvarUsuario(Usuario usuario) {
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword())); // Criptografa a senha
         usuarioRepository.save(usuario);
     }
 
-    // Deleta um usuário pelo ID
     public void deletarUsuario(String id) {
         usuarioRepository.deleteById(id);
     }
 
-    // Lista todos os usuários
     public Iterable<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
-    // Atualiza o usuário
     public void atualizarUsuario(String id, Usuario usuarioAtualizado) {
         usuarioRepository.findById(id).ifPresent(usuarioExistente -> {
             usuarioExistente.setUsername(usuarioAtualizado.getUsername());
@@ -54,7 +48,6 @@ public class UsuarioService {
             if (usuarioAtualizado.getRole() != null && !usuarioAtualizado.getRole().equals(usuarioExistente.getRole())) {
                 org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
 
-                // CORREÇÃO: Verifica tanto "ADMIN" quanto "ROLE_ADMIN"
                 boolean isAdmin = auth.getAuthorities().stream()
                         .anyMatch(a -> a.getAuthority().equals("ADMIN") || a.getAuthority().equals("ROLE_ADMIN"));
 
