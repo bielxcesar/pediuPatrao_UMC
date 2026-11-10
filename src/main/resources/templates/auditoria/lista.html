@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registros de Auditoria</title>
+    <!-- Importação do Bootstrap e Ícones -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Garante que o menu e o conteúdo fiquem lado a lado */
+        body {
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f8f9fa; /* Fundo levemente cinza para destacar a tabela */
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar incluído como fragmento -->
+<aside>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+</aside>
+
+<!-- Conteúdo Principal -->
+<div class="main-content">
+    <div class="container-fluid mt-4">
+
+        <h1 class="mb-4 fw-bold">
+            <i class="bi bi-clipboard-data me-2 text-primary"></i>Histórico de Auditoria
+        </h1>
+
+        <!-- Tabela com design Bootstrap (Card e Sombra) -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark text-nowrap">
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Usuário</th>
+                        <th>Perfil</th>
+                        <th>Operação</th>
+                        <th>Entidade</th>
+                        <th>Campo</th>
+                        <th>De</th>
+                        <th>Para</th>
+                        <th>Justificativa</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Exibe mensagem bonita caso não haja nenhum registro no banco -->
+                    <tr th:if="${#lists.isEmpty(registros)}">
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            Nenhum registro de auditoria encontrado.
+                        </td>
+                    </tr>
+
+                    <!-- Preenche os dados usando as variáveis exatas do seu backend -->
+                    <tr th:each="registro : ${registros}">
+                        <td th:text="${#temporals.format(registro.dataHora, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${registro.usuario}"></td>
+                        <td th:text="${registro.role}"></td>
+                        <td th:text="${registro.operacao}"></td>
+                        <td th:text="${registro.entidadeAfetada}"></td>
+                        <td th:text="${registro.campoModificado}"></td>
+                        <td th:text="${registro.valorAnterior}"></td>
+                        <td th:text="${registro.valorNovo}"></td>
+                        <td th:text="${registro.justificativa}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

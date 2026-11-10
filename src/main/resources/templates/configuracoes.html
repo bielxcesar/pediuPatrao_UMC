@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="content" class="pb-4">
+    <h1 class="h3">Configurações</h1>
+    <div class="card mt-3">
+        <div class="card-body">
+            <h2 class="h5">Aparência</h2>
+            <label for="preferencia-tema" class="form-label">Tema do sistema</label>
+            <select id="preferencia-tema" class="form-select w-auto" aria-describedby="preferencia-tema-ajuda">
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+            </select>
+            <p id="preferencia-tema-ajuda" class="form-text mb-0">Sua escolha fica salva neste navegador.</p>
+            <p id="preferencia-tema-status" class="form-text mb-0" role="status"></p>
+        </div>
+    </div>
+</section>
+</body>
+</html>
