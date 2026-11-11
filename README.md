@@ -10,63 +10,9 @@ O **Pediu Patrão** é uma solução para gestão operacional de pedidos em esta
 
 ---
 
-## Sumário
+## Vídeo de demonstração
 
-- [Arquitetura](#arquitetura)
-- [Tecnologias utilizadas](#tecnologias-utilizadas)
-- [Requisitos do sistema de pedidos](#requisitos-do-sistema-de-pedidos)
-- [Ambiente de teste](#ambiente-de-teste)
-- [Contas e permissões](#contas-e-permissões)
-- [Roteiro de verificação](#roteiro-de-verificação)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Segurança e conformidade](#segurança-e-conformidade)
-- [Dashboard administrativo](#dashboard-administrativo)
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-    Navegador["Navegador · Thymeleaf, Bootstrap e Chart.js"]
-    Seguranca["Spring Security · autenticação, papéis e CSRF"]
-    Web["Controladores MVC e API REST"]
-    Servicos["Serviços · pedidos, usuários, auditoria e dashboard"]
-    Repo["Spring Data MongoDB · repositórios"]
-    Sessao["Spring Session · sessão HTTP"]
-    DB[("MongoDB")]
-
-    Navegador --> Seguranca --> Web --> Servicos --> Repo --> DB
-    Seguranca --> Sessao --> DB
-```
-
-- O Thymeleaf renderiza o layout e o JavaScript consulta o resumo em JSON para preencher indicadores, gráfico e ranking.
-- Os controladores recebem as requisições. O `DashboardService` consolida as vendas, os status e os produtos a partir dos pedidos consultados pelo repositório.
-- O Spring Security verifica a sessão e o perfil antes de liberar a página ou a API. O Spring Session guarda a sessão HTTP no mesmo banco configurado para a aplicação.
-- O MongoDB armazena pedidos, clientes, usuários, produtos, auditoria e sessões. A fila exibe até seis finalizados recentes e o banco preserva o histórico para o painel.
-- A preferência de tema fica no navegador e se aplica às telas que usam o layout compartilhado.
-
-## Tecnologias utilizadas
-
-| Camada | Tecnologia |
-| --- | --- |
-| Aplicação | Java 21 e Spring Boot 3.4.4 |
-| Interface | Thymeleaf, Bootstrap 5.3, Bootstrap Icons e Chart.js |
-| Segurança | Spring Security, BCrypt e proteção CSRF |
-| Dados e sessões | Spring Data MongoDB e Spring Session |
-| Compilação e execução | Maven Wrapper |
-
-
-## Requisitos do sistema de pedidos
-
-| ID | Requisito |
-| --- | --- |
-| RF01 | Autenticar usuários e aplicar permissões para os perfis ADMIN, GERENTE e ATENDENTE. |
-| RF02 | Cadastrar pedidos com cliente, sabor, tamanho, quantidade e valores. |
-| RF03 | Acompanhar os estados RECEBIDO, PREPARANDO, PRONTO, A_CAMINHO, FINALIZADO e CANCELADO. A fila mantém até seis finalizados visíveis e o banco preserva o histórico. |
-| RF04 | Aplicar desconto de até 20% no formulário e registrar a justificativa do cancelamento na auditoria. |
-| RF05 | Consultar eventos de auditoria, incluindo alterações de estado, cancelamentos e mudanças de cadastro registradas pelo sistema. |
-
-Os requisitos específicos do dashboard estão na [seção do painel](#dashboard-administrativo).
-
+[Assistir à demonstração do Pediu Patrão](https://youtu.be/tY8gOm895wU)
 
 ## Ambiente de teste
 
@@ -143,6 +89,66 @@ const hoje = new Date();
 ```
 
 Em um banco de teste vazio, o dashboard mostrará **3 pedidos, 2 finalizados, R$ 135,00 de faturamento e R$ 67,50 de ticket médio**. Calabresa ficará em primeiro no ranking, com duas unidades. Esses dados de reprodução são menores que o conjunto usado nas evidências da entrega.
+
+## Sumário
+
+- [Vídeo de demonstração](#vídeo-de-demonstração)
+
+- [Arquitetura](#arquitetura)
+- [Tecnologias utilizadas](#tecnologias-utilizadas)
+- [Requisitos do sistema de pedidos](#requisitos-do-sistema-de-pedidos)
+- [Ambiente de teste](#ambiente-de-teste)
+- [Contas e permissões](#contas-e-permissões)
+- [Roteiro de verificação](#roteiro-de-verificação)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Segurança e conformidade](#segurança-e-conformidade)
+- [Dashboard administrativo](#dashboard-administrativo)
+
+## Arquitetura
+
+```mermaid
+flowchart LR
+    Navegador["Navegador · Thymeleaf, Bootstrap e Chart.js"]
+    Seguranca["Spring Security · autenticação, papéis e CSRF"]
+    Web["Controladores MVC e API REST"]
+    Servicos["Serviços · pedidos, usuários, auditoria e dashboard"]
+    Repo["Spring Data MongoDB · repositórios"]
+    Sessao["Spring Session · sessão HTTP"]
+    DB[("MongoDB")]
+
+    Navegador --> Seguranca --> Web --> Servicos --> Repo --> DB
+    Seguranca --> Sessao --> DB
+```
+
+- O Thymeleaf renderiza o layout e o JavaScript consulta o resumo em JSON para preencher indicadores, gráfico e ranking.
+- Os controladores recebem as requisições. O `DashboardService` consolida as vendas, os status e os produtos a partir dos pedidos consultados pelo repositório.
+- O Spring Security verifica a sessão e o perfil antes de liberar a página ou a API. O Spring Session guarda a sessão HTTP no mesmo banco configurado para a aplicação.
+- O MongoDB armazena pedidos, clientes, usuários, produtos, auditoria e sessões. A fila exibe até seis finalizados recentes e o banco preserva o histórico para o painel.
+- A preferência de tema fica no navegador e se aplica às telas que usam o layout compartilhado.
+
+## Tecnologias utilizadas
+
+| Camada | Tecnologia |
+| --- | --- |
+| Aplicação | Java 21 e Spring Boot 3.4.4 |
+| Interface | Thymeleaf, Bootstrap 5.3, Bootstrap Icons e Chart.js |
+| Segurança | Spring Security, BCrypt e proteção CSRF |
+| Dados e sessões | Spring Data MongoDB e Spring Session |
+| Compilação e execução | Maven Wrapper |
+
+
+## Requisitos do sistema de pedidos
+
+| ID | Requisito |
+| --- | --- |
+| RF01 | Autenticar usuários e aplicar permissões para os perfis ADMIN, GERENTE e ATENDENTE. |
+| RF02 | Cadastrar pedidos com cliente, sabor, tamanho, quantidade e valores. |
+| RF03 | Acompanhar os estados RECEBIDO, PREPARANDO, PRONTO, A_CAMINHO, FINALIZADO e CANCELADO. A fila mantém até seis finalizados visíveis e o banco preserva o histórico. |
+| RF04 | Aplicar desconto de até 20% no formulário e registrar a justificativa do cancelamento na auditoria. |
+| RF05 | Consultar eventos de auditoria, incluindo alterações de estado, cancelamentos e mudanças de cadastro registradas pelo sistema. |
+
+Os requisitos específicos do dashboard estão na [seção do painel](#dashboard-administrativo).
+
 
 ## Contas e permissões
 
@@ -286,4 +292,3 @@ Execução em 10/11/2026 com Edge, Spring Boot 3.4.4 e MongoDB Community 7.0.45 
 - [Resposta do endpoint](evidencias/resposta-api.png)
 - [Período vazio](evidencias/periodo-vazio.png)
 - [Intervalo inválido](evidencias/periodo-invalido.png)
-- [Vídeo de demonstração com capturas legendadas](dashboard-demonstracao.mp4)
